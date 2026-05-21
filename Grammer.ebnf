@@ -1,0 +1,34 @@
+COMMENT -> ("//" (.)* "\n" ) | ("/*" .* "*/") ;
+INTEGER -> ( ['0'-'9']+ ) | "0b" ['0'-'1']+ ; 
+
+DataType -> "float" | "int" | "char" | "bool" | "void" ;
+Literal -> NUMBER | STRING | "true" | "false" | "nullptr" ;
+
+Expression -> Assignment ;
+Assignment -> IDENTIFIER "=" Assignment | Equality;
+Equality -> Comparison ( ( "==" | "!=" ) Comparison )* ;
+Comparison -> Term ( ( "<" | "<=" | ">" | ">=" ) Term )* ;
+Term -> Factor ( ( "+" | "-" ) Factor )* ;
+Factor -> Unary ( ( "*" | "/" ) Unary )* ;
+Unary -> ( "!" | "-" ) Unary | Primary ;
+Primary -> Literal | FuncCall | IDENTIFIER | "(" Expression ")" ;
+
+
+VarDec -> DataType IDENTIFIER ("=" Expression)? ;
+
+Statement -> VarDec | Expression | "return" Expression | Block | IfStmt | WhileStmt | "break" | "continue" ;
+Block -> "{" Statement* "}" ;
+IfStmt    -> "if" "(" Expression ")" Block   ( "else" Block )? ;
+WhileStmt -> "while" "(" Expression ")" Block ;
+
+
+ParamList -> VarDec ( "," VarDec )* ;
+FuncDec -> DataType IDENTIFIER "(" ParamList? ")" ;
+
+FuncDef -> FuncDec Block ;
+
+ValueList -> Expression ( "," Expression )* ; 
+FuncCall -> IDENTIFIER "(" ValueList? ")" ;
+
+
+Program -> (VarDec | FuncDef | FuncDef)* ;
