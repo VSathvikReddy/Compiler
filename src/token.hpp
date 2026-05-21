@@ -32,6 +32,7 @@ enum class TokenType : uint8_t {
     DOT,
 
     SEMICOLON,
+    END_OF_FILE
 };
 
 inline std::string tokenTypeToString(TokenType type){
@@ -60,6 +61,7 @@ inline std::string tokenTypeToString(TokenType type){
         case TokenType::DOT: return ".";
         
         case TokenType::SEMICOLON: return ";";
+        case TokenType::END_OF_FILE: return "EOF";
         default: return "UNKNOWN";
     }
 }

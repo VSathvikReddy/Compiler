@@ -1,6 +1,3 @@
-COMMENT -> ("//" (.)* "\n" ) | ("/*" .* "*/") ;
-INTEGER -> ( ['0'-'9']+ ) | "0b" ['0'-'1']+ ; 
-
 DataType -> "float" | "int" | "char" | "bool" | "void" ;
 Literal -> NUMBER | STRING | "true" | "false" | "nullptr" ;
 

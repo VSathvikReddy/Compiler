@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "parser.hpp"
 
 #include <iostream>
 
@@ -13,8 +14,8 @@ int main(int argc, char* argv[]) {
 
     Lexer lexer(argv[1]);
     lexer.print_tokens();
-
-
+    Parser parser(lexer.getTokens());
+    parser.debug_print();
 
 
     return 0;

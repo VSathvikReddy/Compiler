@@ -130,6 +130,7 @@ void Lexer::read_number_literal() {
     std::string_view text = this->source.substr(start, pos - start);
     add_token(TokenType::NUMBER_LITERAL, text);
 }
+
 void Lexer::read_symbols(){
     auto read_symbol = [&](const char* expected, TokenType type) {
         size_t len = strlen(expected);
@@ -141,38 +142,30 @@ void Lexer::read_symbols(){
         return true;
     };
 
-    auto read_symbol_single = [&](char expected, TokenType type) {
-        if (peek() != expected) return false;
-        add_token(type, this->source.substr(this->pos, 1));
-        advance();
-        return true;
-    };
-
-    // 1. Multi-character symbols (Check these first!)
     if (read_symbol("->", TokenType::ARROW)) return;
 
-    // 2. Single-character symbols
-    if (read_symbol_single('!', TokenType::NOT)) return;
-    if (read_symbol_single('^', TokenType::CARET)) return;
-    if (read_symbol_single('|', TokenType::PIPE)) return;
-    if (read_symbol_single('(', TokenType::LPAREN)) return;
-    if (read_symbol_single(')', TokenType::RPAREN)) return;
+    switch (peek()) {
+        case '!': add_token(TokenType::NOT,       this->source.substr(this->pos, 1)); advance(); return;
+        case '^': add_token(TokenType::CARET,     this->source.substr(this->pos, 1)); advance(); return;
+        case '|': add_token(TokenType::PIPE,      this->source.substr(this->pos, 1)); advance(); return;
+        case '(': add_token(TokenType::LPAREN,    this->source.substr(this->pos, 1)); advance(); return;
+        case ')': add_token(TokenType::RPAREN,    this->source.substr(this->pos, 1)); advance(); return;
+        case '*': add_token(TokenType::STAR,      this->source.substr(this->pos, 1)); advance(); return;
+        case '+': add_token(TokenType::PLUS,      this->source.substr(this->pos, 1)); advance(); return;
+        case '?': add_token(TokenType::QUESTION,  this->source.substr(this->pos, 1)); advance(); return;
 
-    if (read_symbol_single('*', TokenType::STAR)) return;
-    if (read_symbol_single('+', TokenType::PLUS)) return;
-    if (read_symbol_single('?', TokenType::QUESTION)) return;
+        case '-': add_token(TokenType::DASH,      this->source.substr(this->pos, 1)); advance(); return;
+        case '.': add_token(TokenType::DOT,       this->source.substr(this->pos, 1)); advance(); return;
+        case ';': add_token(TokenType::SEMICOLON, this->source.substr(this->pos, 1)); advance(); return;
 
-    if (read_symbol_single('[', TokenType::LBRACKET)) return;
-    if (read_symbol_single(']', TokenType::RBRACKET)) return;
-    if (read_symbol_single('-', TokenType::DASH)) return;
-    if (read_symbol_single('.', TokenType::DOT)) return;
+        case '[': add_token(TokenType::LBRACKET,  this->source.substr(this->pos, 1)); advance(); return;
+        case ']': add_token(TokenType::RBRACKET,  this->source.substr(this->pos, 1)); advance(); return;
 
-    if (read_symbol_single(';', TokenType::SEMICOLON)) return;
-
-    // 3. Fallback for unexpected characters
-    else {
-        std::cerr << "Unexpected character: '" << peek() << "' at " << this->line << ":" << this->col << std::endl;
-        advance();
+        // 3. Fallback for unexpected characters
+        default:
+            std::cerr << "Unexpected character: '" << peek() << "' at " << this->line << ":" << this->col << std::endl;
+            advance();
+            return;
     }
 }
 
