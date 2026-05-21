@@ -1,6 +1,4 @@
 #include "lexer.hpp"
-#include "token_code_gen.hpp"
-#include "token_factory.hpp"
 
 #include <iostream>
 

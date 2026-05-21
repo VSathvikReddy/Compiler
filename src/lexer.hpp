@@ -15,22 +15,24 @@ public:
 
 private:
     std::string_view source;
+
     std::string file_data;
+    std::string file_name;
 
     size_t pos = 0;
     int line = 1;
+    int col = 1;
 
     std::vector<Token> tokens;
 
     // Token creation dispatch helpers
-    void add_token(TokenType type, const std::string& lexeme);
-    void add_token(TokenType type, uint16_t value);
-    void add_token(TokenType type);
+    void add_token(TokenType type, std::string_view lexeme);
 
     void tokenize();
     void read_identifiers();
     void read_string_literal();
     void read_char_literal();
+    void read_number_literal();
     void read_symbols();
     void skip_comment_and_whitespace();
 
