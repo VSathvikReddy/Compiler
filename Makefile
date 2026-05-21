@@ -3,8 +3,8 @@
 TARGET_EXEC := compiler
 
 BUILD_DIR := build
-SRC_DIR := .
-INC_DIR := .
+SRC_DIR := src
+INC_DIR := src
 
 SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)

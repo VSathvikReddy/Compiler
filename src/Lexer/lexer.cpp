@@ -48,7 +48,10 @@ void Lexer::tokenize() {
             read_identifiers();
         }else if (c == '"') {
             read_string_literal();
-        }else {
+        }else if(c == '\''){
+            read_char_literal();
+        }
+        else {
             read_symbols();
         }
     }
@@ -74,6 +77,38 @@ void Lexer::read_identifiers() {
 
     TokenType deduced_type = is_all_upper ? TokenType::TOKEN_IDENTIFIER : TokenType::PARSE_IDENTIFIER;
     add_token(deduced_type, lexeme);
+}
+
+void Lexer::read_char_literal() {
+    advance(); // 1. Skip opening single quote '\''
+    
+    if (eof()) {
+        std::cerr << "Lexical Error: Empty or unterminated character literal at line " << line << std::endl;
+        return;
+    }
+
+    // 2. Handle escape character if present
+    if (peek() == '\\') {
+        advance(); // Consume the backslash '\\'
+        if (eof()) {
+            std::cerr << "Lexical Error: Trailing escape character at line " << line << std::endl;
+            return;
+        }
+    }
+    
+    // 3. Consume the actual character value (e.g., 'a' or the 'n' in '\n')
+    advance(); 
+
+    // 4. Validate and consume the closing quote
+    if (peek() != '\'') {
+        std::cerr << "Lexical Error: Unterminated character literal at line " << line << std::endl;
+        return;
+    }
+    
+    advance(); // Safely skip closing single quote '\''
+    
+    // Optional: Extract the lexeme if you want to store it
+    // add_token(TokenType::CHAR_LITERAL, lexeme);
 }
 
 void Lexer::read_string_literal() {
@@ -121,6 +156,7 @@ void Lexer::read_symbols() {
         case '[': add_token(TokenType::LBRACKET, static_cast<uint16_t>('[')); advance(); return;
         case ']': add_token(TokenType::RBRACKET, static_cast<uint16_t>(']')); advance(); return;
         case '-': add_token(TokenType::DASH, static_cast<uint16_t>('-')); advance(); return;
+        case '^': add_token(TokenType::NOT, static_cast<uint16_t>('^')); advance(); return;
         default:
             std::cerr << "Lexical Error: Unrecognized structural character '" << current << "' at line " << line << std::endl;
             advance();

@@ -30,6 +30,7 @@ private:
     void tokenize();
     void read_identifiers();
     void read_string_literal();
+    void read_char_literal();
     void read_symbols();
     void skip_comment_and_whitespace();
 

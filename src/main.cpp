@@ -1,7 +1,7 @@
 #include "lexer.hpp"
 #include "token_code_gen.hpp"
 #include "token_factory.hpp"
-#include "lexer_code_gen.hpp"
+
 #include <iostream>
 
 int main(int argc, char* argv[]) {

@@ -6,24 +6,29 @@
 enum class TokenType : uint8_t {
     PARSE_IDENTIFIER,
     TOKEN_IDENTIFIER,
+
     STRING_LITERAL,
+    CHAR_LITERAL,
+    NUMBER_LITERAL,
 
     ARROW = '>',
 
+    NOT = '^',
     PIPE = '|',
     LPAREN = '(',
     RPAREN = ')',
-    SEMICOLON = ';',
+    
 
     STAR = '*',
     PLUS = '+',
     QUESTION = '?',
-
-    CHAR_LITERAL,
-    NUMBER_LITERAL,
+    
     LBRACKET = '[',
     RBRACKET = ']',
-    DASH = '-'
+    DASH = '-',
+
+
+    SEMICOLON = ';',
 };
 
 struct Token {
