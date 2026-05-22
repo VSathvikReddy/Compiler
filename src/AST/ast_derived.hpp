@@ -1,37 +1,8 @@
 #pragma once
 
-#include <cstdint>
-#include <string>
+#include "ast_base.hpp"
+
 #include <string_view>
-
-class ASTVisitor;
-
-struct ASTNode {
-    virtual ~ASTNode() = default; 
-    virtual void accept(ASTVisitor& visitor) = 0;
-};
-
-enum class BinaryOp: uint8_t {
-    OR,   // |
-    XOR,  // ^^
-    NEXT  // Sequence / Concatenation
-};
-
-enum class UnaryOp : uint8_t{
-    NOT,      // !
-    PLUS,     // +
-    STAR,     // *
-    QUESTION  // ?
-};
-
-enum class TextNodeType{
-    PARSER,
-    LEXICAL,
-    KEYWORD,
-    SYMBOL,
-    LITERAL
-};
-
 
 #define VISIT_OVERRIDE void accept(ASTVisitor& visitor) override
 
@@ -72,7 +43,7 @@ struct RangeNode : public ASTNode {
 struct StringNode : public ASTNode {
     std::string text;
 
-    explicit StringNode(const std::string& lit) : text(lit) {}
+    explicit StringNode(const std::string& lit);
     VISIT_OVERRIDE;
 };
 
@@ -90,6 +61,30 @@ struct CharNode : public ASTNode {
     explicit CharNode(char lit);
     VISIT_OVERRIDE;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define AST_VISIT_OVVERIDE_FUNCTIONS  virtual void visit(const BinaryOperation& node) override; \
+    virtual void visit(const UnaryOperation& node) override;  \
+    virtual void visit(const WildcardNode& node) override;    \
+    virtual void visit(const RangeNode& node) override;       \
+    virtual void visit(const StringNode& node) override;      \
+    virtual void visit(const StringViewNode& node) override;  \
+    virtual void visit(const CharNode& node) override;
 
 
 class ASTVisitor{

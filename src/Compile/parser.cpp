@@ -1,6 +1,7 @@
 #include "parser.hpp"
 #include "ast_printer.hpp"
-#include "ast.hpp"
+#include "ast_derived.hpp"
+
 #include <iostream>
 
 
