@@ -1,10 +1,10 @@
-#include <unordered_map>
-#include <string>
+#pragma once
 
 #include <unordered_map>
 #include <string>
 
-const std::unordered_map<char, std::string> KEYBOARD_CHAR_MAP = {
+
+inline const std::unordered_map<char, std::string> KEYBOARD_CHAR_MAP = {
     // --- Special Symbols & Punctuation (Top Row / Shift Keys) ---
     {'~', "TILDE"},
     {'`', "GRAVE"},

@@ -80,6 +80,7 @@ std::ofstream& TokenGenerator::outputTokenType(std::ofstream& out) {
 
 
     auto printer = [&out](std::unordered_map<std::string, std::string>& tokens, const std::string& section_name) {
+        
         out << "\n\t" << section_name << "\n";
         for (const auto& [lexeme, enum_name] : tokens) {
             out << "\t" << enum_name << ",\n";
@@ -89,8 +90,7 @@ std::ofstream& TokenGenerator::outputTokenType(std::ofstream& out) {
     printer(identifier_tokens, "// Raw Token Identifiers");
     printer(keywords_tokens, "// Keywords");
     printer(symbol_tokens, "// Symbols");
-
-    out.seekp(-2, std::ios_base::cur);
+    //Trailing Zeros
     out << "\n};\n";
 
     return out;
@@ -101,7 +101,7 @@ std::ofstream& TokenGenerator::outputKeywordMap(std::ofstream& out){
     for (const auto& [lexeme, enum_name] : keywords_tokens) {
         out << "\t{\"" << lexeme << "\", TokenType::" << enum_name << "},\n";
     }
-    out.seekp(-2, std::ios_base::cur);
+    //Trailing Zeros
     out << "\n};\n";
     return out;
 }
@@ -115,8 +115,22 @@ std::ofstream& TokenGenerator::outputToStringFunction(std::ofstream& out) {
 	out << "\tswitch (type) {\n";
 
     auto printer = [&out](std::unordered_map<std::string, std::string>& tokens) {
+        auto escape_string = [](std::string_view s){
+            std::string result;
+            for (char c : s) {
+                switch (c) {
+                    case '\n': result += "\\\\n"; break;
+                    case '\t': result += "\\\\t"; break;
+                    case '\r': result += "\\\\r"; break;
+                    case '\"': result += "\\\\\""; break;
+                    case '\\': result += "\\\\\\"; break;
+                    default:   result += c;     break;
+                }
+            }
+            return result;
+        };
         for (const auto& [lexeme, enum_name] : tokens) {
-            out << "\t\tcase TokenType::" << enum_name << ": return \"" << lexeme << "\";\n";
+            out << "\t\tcase TokenType::" << enum_name << ": return \"" << escape_string(lexeme) << "\";\n";
         }out<<'\n';
     };
     printer(identifier_tokens);

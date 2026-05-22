@@ -1,5 +1,6 @@
 #include "lexer.hpp"
 #include "parser.hpp"
+#include "token_code_gen.hpp"
 
 #include <iostream>
 
@@ -16,6 +17,9 @@ int main(int argc, char* argv[]) {
     lexer.print_tokens();
     Parser parser(lexer.getTokens());
     parser.debug_print();
+
+    TokenGenerator gen(parser.getlLexicalNodes(),parser.grtParserNodes());
+    gen.output("test.hpp");
 
 
     return 0;

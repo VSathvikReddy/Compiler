@@ -3,7 +3,8 @@
 #include "ast_derived.hpp"
 
 #include <iostream>
-
+#include <string_view>
+#include <cctype>
 
 namespace {
     char unescape_char(std::string_view lexeme) {
@@ -56,6 +57,12 @@ Parser::~Parser() {
     for (auto& [name, node] : parser_nodes) {
         delete node;
     }
+}
+std::unordered_map<std::string_view, ASTNode*> &Parser::getlLexicalNodes(){
+    return lexical_nodes;
+}
+std::unordered_map<std::string_view, ASTNode*> &Parser::grtParserNodes(){
+    return parser_nodes;
 }
 
 void Parser::parse(){
@@ -396,6 +403,27 @@ ASTNode* Parser::parseParsingUnary(){
 }
 
 
+//in lex_token.cpp 44, keep in mind
+inline bool is_valid_keyword_format(std::string_view sv) {
+    if (sv.empty()) return false;
+
+    size_t i = 0;    // 1. Skip leading underscores
+    while (i < sv.size() && sv[i] == '_')i++;
+
+    if (i == sv.size()) return false;
+
+    if (!std::isalpha(sv[i])) {
+        return false;
+    }
+
+    for (; i < sv.size(); ++i) {
+        if (!std::isalnum(sv[i]) && sv[i] != '_') {
+            return false;
+        }
+    }
+
+    return true;
+}
 ASTNode* Parser::parseParsingPrimary(){
     Token tok = peek();
 
@@ -424,7 +452,7 @@ ASTNode* Parser::parseParsingPrimary(){
             }
 
             //Classify based on the first character, can me issue later
-            if (std::isalpha(content[0]) || content[0] == '_') {
+            if (is_valid_keyword_format(content)){
                 return new StringViewNode(content,TextNodeType::KEYWORD);  // e.g., "if", "while", "_return"
             } else {
                 return new StringViewNode(content,TextNodeType::SYMBOL); // e.g., "+", "==", ";", "\n"

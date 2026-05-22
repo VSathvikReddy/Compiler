@@ -42,8 +42,10 @@ TokenGenerator::TokenGenerator(const Container& lexical_nodes, const Container& 
         itr.second->accept(pgen);
     }
 
+    LexTokenGen lgen(*this);
     for(auto itr: lexical_nodes){
-
+        lgen.root = itr.first;
+        itr.second->accept(lgen);
     }
 
 }

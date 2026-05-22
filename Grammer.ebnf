@@ -1,3 +1,22 @@
+COMMENT -> "/*" ( !('*') | '*' !('/') )* "*/" ;
+COMMENT -> "//" !('\n')* '\n' ;
+SKIP -> ( ' ' | '\r' | '\t' )+ ;
+LINEBREAKER -> '\n' ;
+EQ -> "==" ;
+ASSIGN -> "=" ;
+
+INTEGER -> ['0'-'9']+ ;
+FLOAT -> INTEGER '.' INTEGER ;
+NUMBER -> INTEGER | FLOAT ;
+STRING -> '\"'  ( !( '\\' | '\"' )  | '\\' . )*  '\"' ;
+CHAR -> '\'' ( !('\\' | '\'' ) | '\\' . ) '\'' ;
+IDENTIFIER -> ( ['a'-'z'] | ['A'-'Z'] | '_' ) ( ['a'-'z'] | ['A'-'Z'] | ['0'-'9'] | '_' )* ;
+
+
+
+
+
+
 DataType -> "float" | "int" | "char" | "bool" | "void" ;
 Literal -> NUMBER | STRING | "true" | "false" | "nullptr" ;
 

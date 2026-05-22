@@ -10,6 +10,8 @@ public:
     Parser(const std::vector<Token>& tokens);
     ~Parser();
 
+    std::unordered_map<std::string_view, ASTNode*> &getlLexicalNodes();
+    std::unordered_map<std::string_view, ASTNode*> &grtParserNodes();
     void debug_print();
 private:
     const std::vector<Token>& tokens;

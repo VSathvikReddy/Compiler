@@ -1,5 +1,6 @@
 #include "parse_token_gen.hpp"
 #include "token_code_gen.hpp"
+#include "char_map.hpp"
     
 #include <iostream>
 
@@ -22,21 +23,30 @@ void ParseTokenGen::visit(const RangeNode& /*node*/){
     std::cerr<<"Wtf []\n";
     return;
 }  
-void ParseTokenGen::visit(const StringNode& node){
+void ParseTokenGen::visit(const StringNode&  /*node*/){
+    std::cerr<<"Again wtf\n";
     return;
 }  
 void ParseTokenGen::visit(const StringViewNode& node){
     switch(node.type){
         case(TextNodeType::SYMBOL):{
-
+            std::string token = "SYMBOL";
+            for(const char c: node.text){
+                token+= "_";
+                token+= KEYBOARD_CHAR_MAP.at(c);
+            }
+            symbol_tokens.emplace(std::string(node.text),token);
             break;
         }
         case(TextNodeType::KEYWORD):{
-           keywords_tokens.insert(static_cast<std::string>(node.text),"KW_"+static_cast<std::string>(node.text));
-           break;
+            std::string text_str(node.text);
+            keywords_tokens.emplace(text_str, "KW_" + text_str);
+            break;
         }
         case(TextNodeType::LEXICAL):{
-            identifier_tokens.insert(static_cast<std::string>(node.text),"LITEREAL_"+static_cast<std::string>(node.text));
+            std::string text_str(node.text);
+            identifier_tokens.emplace(text_str, "LITEREAL_" + text_str);
+            break;
         }
         case(TextNodeType::PARSER):
         default:
@@ -44,5 +54,6 @@ void ParseTokenGen::visit(const StringViewNode& node){
     }
 }  
 void ParseTokenGen::visit(const CharNode& node){
-
+    std::string key(1, node.text);
+    symbol_tokens.emplace(key,"SYMBOL_"+key);
 }
