@@ -12,6 +12,8 @@ IDENTIFIER -> ( ['a'-'z'] | ['A'-'Z'] | '_' ) ( ['a'-'z'] | ['A'-'Z'] | ['0'-'9'
 Expression -> Oring ;
 Oring -> Concatnate ('|' Concatnate)* ;
 Concatnate -> Removal (Removal)* ;
-Removal -> Unary ('^' Unary)* ; 
-Unary -> '!' Unary | Unary ( '+' | '*' | '?' ) | Primary ; 
+Removal -> Suffix ('^' Suffix)* ; 
+
+Suffix -> Suffix ( '+' | '*' | '?' ) | Prefix ; 
+Prefix -> '!' Prefix | Primary;
 Primary -> CHAR | STRING | '(' Expression ')' | '[' CHAR '-' CHAR ']' ;

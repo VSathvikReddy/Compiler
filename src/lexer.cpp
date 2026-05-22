@@ -50,7 +50,9 @@ void Lexer::tokenize(){
 }
 
 static bool allCaps(std::string_view text){
-    return std::all_of(text.begin(), text.end(), [](char c){ return std::isupper(c); });
+    return std::all_of(text.begin(), text.end(), [](char c){ 
+        return std::isupper(static_cast<unsigned char>(c)) || c == '_'; 
+    });
 }
 void Lexer::read_identifiers(){
     size_t start = pos;

@@ -15,27 +15,28 @@ private:
     const std::vector<Token>& tokens;
     size_t pos = 0;
 
-    std::unordered_map<std::string_view, LexicalNode*> lexical_nodes;
+    std::unordered_map<std::string_view, ASTNode*> lexical_nodes;
+    std::unordered_map<std::string_view, ASTNode*> parser_nodes;
 
     void parse();
 
     void parseLexerTokens();
-    LexicalNode* parseLexicalSequence();
-    LexicalNode* parseLexicalOr();
-    LexicalNode* parseLexicalConcatnate();
-    LexicalNode* parseLexicalRemoval();
-    LexicalNode* parseLexicalUnary();
-    LexicalNode* parseLexicalPrimary();
+    ASTNode* parseLexicalSequence();
+    ASTNode* parseLexicalOr();
+    ASTNode* parseLexicalConcatnate();
+    ASTNode* parseLexicalRemoval();
+    ASTNode* parseLexicalPrefix();
+    ASTNode* parseLexicalUnary();
+    ASTNode* parseLexicalPrimary();
 
 
 
-    void parseParserTokens(){
-        while (peek().type!=TokenType::SEMICOLON){
-            advance();
-        }
-        advance();
-    }
-
+    void parseParserTokens();
+    ASTNode* parseParsingSequence();
+    ASTNode* parseParsingOr();
+    ASTNode* parseParsingConcatnate();
+    ASTNode* parseParsingUnary();
+    ASTNode* parseParsingPrimary();
 
 
 

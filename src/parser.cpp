@@ -1,5 +1,6 @@
 #include "parser.hpp"
-#include "help.hpp"
+#include "ast_printer.hpp"
+#include "ast.hpp"
 #include <iostream>
 
 
@@ -50,6 +51,9 @@ Parser::Parser(const std::vector<Token>& tokens) : tokens(tokens) {
 Parser::~Parser() {
     for (auto& [name, node] : lexical_nodes) {
         delete node;
+    } 
+    for (auto& [name, node] : parser_nodes) {
+        delete node;
     }
 }
 
@@ -66,50 +70,107 @@ void Parser::parse(){
     
 }
 
-void Parser::debug_print(){
-    for(const auto& itr:lexical_nodes){
-        std::cout<<itr.first<<":\n";
-        print_ast(itr.second);
-        std::cout<<"\n\n";
+void Parser::debug_print() {
+    ASTPrinter printer; // Create the visitor
+
+    std::cout << "=== LEXICAL RULES ===\n";
+    for(const auto& itr : lexical_nodes) {
+        std::cout << "Rule: " << itr.first << "\n";
+        if (itr.second) {
+            itr.second->accept(printer); // Dispatch the visitor
+        }
+        std::cout << "\n";
+    }
+
+    std::cout << "=== PARSER RULES ===\n";
+    for(const auto& itr : parser_nodes) {
+        std::cout << "Rule: " << itr.first << "\n";
+        if (itr.second) {
+            itr.second->accept(printer); // Dispatch the visitor
+        }
+        std::cout << "\n";
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// The backslashes (\) are required to make a multi-line macro!
+#define PARSER_START(container, InitialFunction)                                                \
+    std::string_view name = advance().lexeme;                                                   \
+    consume(TokenType::ARROW, "Expecting -> after literal");                                    \
+                                                                                                \
+    ASTNode* root = InitialFunction();                                                          \
+    consume(TokenType::SEMICOLON, "Expected ; to end statement");                               \
+                                                                                                \
+    auto it = container.find(name);                                                             \
+    if (it == container.end()) {                                                                \
+        container[name] = root;                                                                 \
+    } else {                                                                                    \
+        it->second = new BinaryOperation(it->second, root, BinaryOp::OR);                       \
+    }
+
 
 void Parser::parseLexerTokens(){
-    std::string_view name = advance().lexeme;
-    consume(TokenType::ARROW,"Expecting -> after litral");
-
-    LexicalNode* root = parseLexicalSequence();
-    consume(TokenType::SEMICOLON,"Expected ; to end statment");
-    
-    auto it = lexical_nodes.find(name);
-    if(it == lexical_nodes.end()){
-        lexical_nodes[name] =  root;
-    }else{
-        it->second = new BinaryLexicalOperation(it->second,root,BinaryLexicalOp::OR);
-    }
+    PARSER_START(lexical_nodes,parseLexicalSequence)    
 }
 
+
 // Expression -> Oring ;
-LexicalNode* Parser::parseLexicalSequence() {
+ASTNode* Parser::parseLexicalSequence() {
     return parseLexicalOr();
 }
 
 // Oring -> Concatnate ('|' Concatnate)* ;
-LexicalNode* Parser::parseLexicalOr() {
-    LexicalNode* left = parseLexicalConcatnate();
+ASTNode* Parser::parseLexicalOr() {
+    ASTNode* left = parseLexicalConcatnate();
 
     while (peek().type == TokenType::PIPE) {
         advance();
-        LexicalNode* right = parseLexicalConcatnate();
-        left = new BinaryLexicalOperation(left, right, BinaryLexicalOp::OR);
+        ASTNode* right = parseLexicalConcatnate();
+        left = new BinaryOperation(left, right, BinaryOp::OR);
     }
     
     return left;
 }
 
 // Concatnate -> Removal (Removal)* ;
-LexicalNode* Parser::parseLexicalConcatnate() {
-    LexicalNode* left = parseLexicalRemoval();
+ASTNode* Parser::parseLexicalConcatnate() {
+    ASTNode* left = parseLexicalRemoval();
 
     // Since concatenation has no explicit symbol (like A B), we loop as long 
     // as we don't hit a structural boundary that belongs to lower precedence
@@ -119,21 +180,21 @@ LexicalNode* Parser::parseLexicalConcatnate() {
            peek().type != TokenType::SEMICOLON && 
            peek().type != TokenType::RPAREN) {
         
-        LexicalNode* right = parseLexicalRemoval();
-        left = new BinaryLexicalOperation(left, right, BinaryLexicalOp::NEXT);
+        ASTNode* right = parseLexicalRemoval();
+        left = new BinaryOperation(left, right, BinaryOp::NEXT);
     }
     
     return left;
 }
 
 // Removal -> Unary ('^' Unary)* ;
-LexicalNode* Parser::parseLexicalRemoval() {
-    LexicalNode* left = parseLexicalUnary();
+ASTNode* Parser::parseLexicalRemoval() {
+    ASTNode* left = parseLexicalUnary();
 
     while (peek().type == TokenType::CARET) {
         advance(); // Consume '^'
-        LexicalNode* right = parseLexicalUnary();
-        left = new BinaryLexicalOperation(left, right, BinaryLexicalOp::XOR); 
+        ASTNode* right = parseLexicalUnary();
+        left = new BinaryOperation(left, right, BinaryOp::XOR); 
     }
     
     return left;
@@ -141,58 +202,83 @@ LexicalNode* Parser::parseLexicalRemoval() {
 
 // Unary -> '!' Unary | Unary ( '+' | '*' | '?' ) | Primary ;
 
-UnaryLexicalOp token_to_u_op(const Token& to){
+UnaryOp token_to_u_op(const Token& to){
     switch (to.type){
-    case TokenType::PLUS: return UnaryLexicalOp::PLUS;
-    case TokenType::STAR: return UnaryLexicalOp::STAR;
-    case TokenType::QUESTION: return UnaryLexicalOp::QUESTION;
+    case TokenType::PLUS: return UnaryOp::PLUS;
+    case TokenType::STAR: return UnaryOp::STAR;
+    case TokenType::QUESTION: return UnaryOp::QUESTION;
     default:
         std::cerr<<"Token: "<<tokenTypeToString(to.type)<<" not an unaryoperation at "<<to.error_info.line<<"\n";
-        return UnaryLexicalOp::QUESTION;
+        return UnaryOp::QUESTION;
     }
 }
-LexicalNode* Parser::parseLexicalUnary() {
-    //recursively to allow !!A
-    LexicalNode* node = nullptr;
+
+
+// 1. Prefix binds tightly to the primary token
+ASTNode* Parser::parseLexicalPrefix() {
     if (peek().type == TokenType::NOT) {
-        advance(); // Consume '!'
-        node =  new UnaryLexicalOperation(parseLexicalUnary(), UnaryLexicalOp::NOT);
-    }else{
-        node = parseLexicalPrimary();
+        advance(); 
+        return new UnaryOperation(parseLexicalPrefix(), UnaryOp::NOT);
     }
+    return parseLexicalPrimary();
+}
 
-   
+// 2. Postfix applies AFTER prefix is evaluated
+ASTNode* Parser::parseLexicalUnary() {
+    // Start by getting the prefix/primary node
+    ASTNode* node = parseLexicalPrefix();
 
-    // Postfix loop (Allows stacking modifiers like A+?)
-    //Should it be ?
+    // Now apply any trailing modifiers
     while (peek().type == TokenType::PLUS || 
            peek().type == TokenType::STAR || 
            peek().type == TokenType::QUESTION) {
-        
-
-        node = new UnaryLexicalOperation(node, token_to_u_op(advance()));
+        node = new UnaryOperation(node, token_to_u_op(advance()));
     }
     
     return node;
 }
+// ASTNode* Parser::parseLexicalUnary() {
+//     //recursively to allow !!A
+//     ASTNode* node = nullptr;
+//     if (peek().type == TokenType::NOT) {
+//         advance(); // Consume '!'
+//         node =  new UnaryOperation(parseLexicalUnary(), UnaryOp::NOT);
+//     }else{
+//         node = parseLexicalPrimary();
+//     }
+
+   
+
+//     // Postfix loop (Allows stacking modifiers like A+?)
+//     //Should it be ?
+//     while (peek().type == TokenType::PLUS || 
+//            peek().type == TokenType::STAR || 
+//            peek().type == TokenType::QUESTION) {
+        
+
+//         node = new UnaryOperation(node, token_to_u_op(advance()));
+//     }
+    
+//     return node;
+// }
 
 // Primary -> CHAR | STRING | '(' Expression ')' | '[' CHAR '-' CHAR ']' ;
-LexicalNode* Parser::parseLexicalPrimary() {
+ASTNode* Parser::parseLexicalPrimary() {
     Token tok = peek();
 
     switch (tok.type) {
         case TokenType::CHAR_LITERAL:
             advance();
-            return new CharLiteralNode(unescape_char(tok.lexeme));
+            return new CharNode(unescape_char(tok.lexeme));
 
         case TokenType::STRING_LITERAL:
             advance();
-            return new StringLiteralNode(unescape_string(tok.lexeme));
+            return new StringNode(unescape_string(tok.lexeme));
 
         // Grouping loops back to the very top: '(' Expression ')'
         case TokenType::LPAREN: {
             advance(); // consume '('
-            LexicalNode* inner = parseLexicalSequence(); 
+            ASTNode* inner = parseLexicalSequence(); 
             consume(TokenType::RPAREN, "Expected ')' to close grouping");
             return inner;
         }
@@ -217,7 +303,7 @@ LexicalNode* Parser::parseLexicalPrimary() {
 
         case TokenType::TOKEN_IDENTIFIER:
             advance();
-            return new RuleReferenceNode(tok.lexeme);
+            return new StringViewNode(tok.lexeme, TextNodeType::LEXICAL);
 
 
         case TokenType::PARSE_IDENTIFIER:
@@ -233,6 +319,147 @@ LexicalNode* Parser::parseLexicalPrimary() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void Parser::parseParserTokens(){
+    PARSER_START(parser_nodes,parseParsingSequence)
+}
+#undef PARSER_START
+
+
+
+ASTNode* Parser::parseParsingSequence(){
+    return parseParsingOr();
+}
+
+
+ASTNode* Parser::parseParsingOr() {
+    ASTNode* left = parseParsingConcatnate();
+
+    while (peek().type == TokenType::PIPE) {
+        advance();
+        ASTNode* right = parseParsingConcatnate();
+        left = new BinaryOperation(left, right, BinaryOp::OR);
+    }
+    
+    return left;
+}
+
+
+ASTNode* Parser::parseParsingConcatnate() {
+    ASTNode* left = parseParsingUnary();
+
+    // Since concatenation has no explicit symbol (like A B), we loop as long 
+    // as we don't hit a structural boundary that belongs to lower precedence
+    // or closes an expression.
+    while (!eof() && 
+           peek().type != TokenType::PIPE && 
+           peek().type != TokenType::SEMICOLON && 
+           peek().type != TokenType::RPAREN) {
+        
+        ASTNode* right = parseParsingUnary();
+        left = new BinaryOperation(left, right, BinaryOp::NEXT);
+    }
+    
+    return left;
+}
+
+
+ASTNode* Parser::parseParsingUnary(){
+    ASTNode* node = parseParsingPrimary();
+    // Postfix loop (Allows stacking modifiers like A+?)
+    //Should it be ?
+    while (peek().type == TokenType::PLUS || 
+           peek().type == TokenType::STAR || 
+           peek().type == TokenType::QUESTION){
+
+        node = new UnaryOperation(node, token_to_u_op(advance()));
+    }
+    
+    return node;
+}
+
+
+ASTNode* Parser::parseParsingPrimary(){
+    Token tok = peek();
+
+    switch (tok.type) {
+        case(TokenType::PARSE_IDENTIFIER):
+            advance();
+            return new StringViewNode(tok.lexeme,TextNodeType::PARSER);
+        case(TokenType::TOKEN_IDENTIFIER) :
+            advance();
+            return new StringViewNode(tok.lexeme,TextNodeType::LEXICAL);
+        case TokenType::LPAREN: {
+            advance(); // consume '('
+            ASTNode* inner = parseParsingSequence(); 
+            consume(TokenType::RPAREN, "Expected ')' to close grouping");
+            return inner;
+        }
+
+        case(TokenType::STRING_LITERAL):
+        case(TokenType::CHAR_LITERAL):{
+            advance();
+            std::string_view content = tok.lexeme.substr(1, tok.lexeme.size() - 2);
+
+            if (content.empty()) {
+                std::cerr << "Parser Error: Empty literal not allowed in grammar rule.\n";
+                return nullptr;
+            }
+
+            //Classify based on the first character, can me issue later
+            if (std::isalpha(content[0]) || content[0] == '_') {
+                return new StringViewNode(content,TextNodeType::KEYWORD);  // e.g., "if", "while", "_return"
+            } else {
+                return new StringViewNode(content,TextNodeType::SYMBOL); // e.g., "+", "==", ";", "\n"
+            }
+        }
+        default:
+            std::cerr << "Parser Error: Unexpected token in parsing rule '" << tok.lexeme << "'\n";
+            advance();
+            return nullptr;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 bool Parser::eof() const {
     return pos >= tokens.size() || tokens[pos].type == TokenType::END_OF_FILE; 
 }
@@ -242,6 +469,7 @@ const Token& Parser::peek(size_t offset) const {
     if (pos + offset >= tokens.size()) {
         return end_token;
     }
+    //std::cout<<tokens[pos+offset]<<'\n';
     return tokens[pos + offset];
 }
 
@@ -266,3 +494,6 @@ const Token& Parser::consume(TokenType type, const std::string& error_message) {
     std::cerr<<"Parser Error: " + error_message + " at line " << peek().error_info.line<<std::endl;
     return peek();
 }
+
+
+
