@@ -32,60 +32,63 @@ enum class TextNodeType{
     LITERAL
 };
 
+
+#define VISIT_OVERRIDE void accept(ASTVisitor& visitor) override
+
 struct BinaryOperation : public ASTNode {
     ASTNode* left = nullptr;
     ASTNode* right = nullptr;
     BinaryOp op;
 
-    BinaryOperation(ASTNode* l, ASTNode* r, BinaryOp o):left(l), right(r), op(o) {}
-    ~BinaryOperation() override {delete left;delete right;}
+    BinaryOperation(ASTNode* l, ASTNode* r, BinaryOp o);
+    ~BinaryOperation() override;
 
-    void accept(ASTVisitor& visitor) override;
+    VISIT_OVERRIDE;
 };
 
 struct UnaryOperation : public ASTNode {
     ASTNode* operand = nullptr;
     UnaryOp op;
 
-    UnaryOperation(ASTNode* opnd, UnaryOp o):operand(opnd), op(o) {}
-    ~UnaryOperation() override {delete operand;}
+    UnaryOperation(ASTNode* opnd, UnaryOp o);
+    ~UnaryOperation() override;
 
-    void accept(ASTVisitor& visitor) override;
+    VISIT_OVERRIDE;
 };
 
 struct WildcardNode : public ASTNode {
     explicit WildcardNode() = default;
-    void accept(ASTVisitor& visitor) override;
+    VISIT_OVERRIDE;
 };
 
 struct RangeNode : public ASTNode {
     char low;
     char high;
 
-    RangeNode(char l, char h) : low(l), high(h) {}
-    void accept(ASTVisitor& visitor) override;
+    RangeNode(char l, char h);
+    VISIT_OVERRIDE;
 };
 
 struct StringNode : public ASTNode {
     std::string text;
 
     explicit StringNode(const std::string& lit) : text(lit) {}
-    void accept(ASTVisitor& visitor) override;
+    VISIT_OVERRIDE;
 };
 
 struct StringViewNode: public ASTNode{
     std::string_view text;
     TextNodeType type;
 
-    explicit StringViewNode(const std::string_view lit, TextNodeType type) : text(lit), type(type) {}
-    void accept(ASTVisitor& visitor) override;
+    explicit StringViewNode(const std::string_view lit, TextNodeType type);
+    VISIT_OVERRIDE;
 };
 
 struct CharNode : public ASTNode {
     char text;
 
-    explicit CharNode(char lit) : text(lit) {}
-    void accept(ASTVisitor& visitor) override;
+    explicit CharNode(char lit);
+    VISIT_OVERRIDE;
 };
 
 
@@ -99,16 +102,9 @@ public:
     virtual void visit(const WildcardNode& node) = 0;
     virtual void visit(const RangeNode& node) = 0;
     virtual void visit(const StringNode& node) = 0;
-    virtual void visit(const StringViewNode& node) = 0; // Added missing StringViewNode visit
+    virtual void visit(const StringViewNode& node) = 0;
     virtual void visit(const CharNode& node) = 0;
 };
 
-// --- INLINE DEFINITIONS ---
-// These resolve the circular dependency by being placed after ASTVisitor is fully defined.
-inline void BinaryOperation::accept(ASTVisitor& visitor) { visitor.visit(*this); }
-inline void UnaryOperation::accept(ASTVisitor& visitor)  { visitor.visit(*this); }
-inline void WildcardNode::accept(ASTVisitor& visitor)    { visitor.visit(*this); }
-inline void RangeNode::accept(ASTVisitor& visitor)       { visitor.visit(*this); }
-inline void StringNode::accept(ASTVisitor& visitor)        { visitor.visit(*this); }
-inline void StringViewNode::accept(ASTVisitor& visitor)      { visitor.visit(*this); }
-inline void CharNode::accept(ASTVisitor& visitor)        { visitor.visit(*this); }
+
+#undef VISIT_OVERRIDE

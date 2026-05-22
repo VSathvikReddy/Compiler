@@ -73,7 +73,7 @@ void Parser::parse(){
 void Parser::debug_print() {
     ASTPrinter printer; // Create the visitor
 
-    std::cout << "=== LEXICAL RULES ===\n";
+    std::cout << "\n=== LEXICAL RULES ===\n\n";
     for(const auto& itr : lexical_nodes) {
         std::cout << "Rule: " << itr.first << "\n";
         if (itr.second) {
@@ -82,7 +82,7 @@ void Parser::debug_print() {
         std::cout << "\n";
     }
 
-    std::cout << "=== PARSER RULES ===\n";
+    std::cout << "\n=== PARSER RULES ===\n\n";
     for(const auto& itr : parser_nodes) {
         std::cout << "Rule: " << itr.first << "\n";
         if (itr.second) {

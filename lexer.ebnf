@@ -13,7 +13,6 @@ Expression -> Oring ;
 Oring -> Concatnate ('|' Concatnate)* ;
 Concatnate -> Removal (Removal)* ;
 Removal -> Suffix ('^' Suffix)* ; 
-
 Suffix -> Suffix ( '+' | '*' | '?' ) | Prefix ; 
 Prefix -> '!' Prefix | Primary;
 Primary -> CHAR | STRING | '(' Expression ')' | '[' CHAR '-' CHAR ']' ;
