@@ -5,12 +5,14 @@
 
 #include "char_map.hpp"
 #include "ast_derived.hpp"
+#include "parse_token_gen.hpp"
+#include "lex_token_gen.hpp"
 
 #include <fstream>
 
 
 
-class TokenGenerator: public ASTVisitor {
+class TokenGenerator{
 public:
     template <typename Container>
     TokenGenerator(const Container& lexical_nodes, const Container& parser_nodes);
@@ -18,29 +20,30 @@ public:
     
     void output(const char* target);
 
-    AST_VISIT_OVVERIDE_FUNCTIONS
-
 private:
     std::unordered_map<std::string,std::string> symbol_tokens;
     std::unordered_map<std::string,std::string> keywords_tokens;
     std::unordered_map<std::string,std::string> identifier_tokens;
+    friend class ParseTokenGen;
+    friend class LexTokenGen;
 
     std::ofstream& outputPreprocessorDirectives(std::ofstream& out);
     std::ofstream& outputTokenType(std::ofstream& out);
     std::ofstream& outputKeywordMap(std::ofstream& out);
     std::ofstream& outputToStringFunction(std::ofstream& out);
    
-    void extractTokensFromParserNode(ASTNode* container);
-    void extractTokensFromLexicalNode(ASTNode* container);
+
 };
 
 template <typename Container>
 TokenGenerator::TokenGenerator(const Container& lexical_nodes, const Container& parser_nodes){
+    ParseTokenGen pgen(*this);
     for(auto itr: parser_nodes){
-        extractTokensFromParserNode(itr.second);
+        itr.second->accept(pgen);
     }
+
     for(auto itr: lexical_nodes){
-        extractTokensFromLexicalNode(itr.second);
+
     }
 
 }

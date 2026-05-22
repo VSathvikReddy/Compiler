@@ -3,16 +3,6 @@
 #include <iostream>
 
 
-void TokenGenerator::extractTokensFromParserNode(ASTNode* container){
-    container->accept(*this);
-}
-
-
-void TokenGenerator::extractTokensFromLexicalNode(ASTNode* container){
-    
-}
-
-
 
 
 

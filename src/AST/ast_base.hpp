@@ -29,7 +29,6 @@ enum class TextNodeType{
     LEXICAL,
     KEYWORD,
     SYMBOL,
-    LITERAL
 };
 std::string op_to_string(BinaryOp op);
 std::string op_to_string(UnaryOp op);

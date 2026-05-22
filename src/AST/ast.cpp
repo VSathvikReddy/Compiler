@@ -31,7 +31,6 @@ std::string type_to_string(TextNodeType type) {
         case TextNodeType::LEXICAL: return "LEXICAL";
         case TextNodeType::KEYWORD: return "KEYWORD";
         case TextNodeType::SYMBOL: return "SYMBOL";
-        case TextNodeType::LITERAL: return "LITERAL";
         default: return "UNKNOWN";
     }
 }
