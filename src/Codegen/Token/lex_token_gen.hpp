@@ -11,10 +11,13 @@ public:
     LexTokenGen(TokenGenerator& base);
     std::string_view root;
 
+    bool isJustRename();
 
     AST_VISIT_OVVERIDE_FUNCTIONS
 private:
     std::unordered_map<std::string,std::string> &symbol_tokens;
     std::unordered_map<std::string,std::string> &keywords_tokens;
     std::unordered_map<std::string,std::string> &identifier_tokens;
+
+    bool work_done = false;
 };

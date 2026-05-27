@@ -29,8 +29,6 @@ void Lexer::add_token(TokenType type, std::string_view lexeme) {
 void Lexer::tokenize(){
     while(!eof()) {
         skip_comment_and_whitespace();
-        
-
         if (eof()) break;
 
         if (isalpha(peek()) || peek() == '_') {

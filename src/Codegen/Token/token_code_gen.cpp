@@ -15,7 +15,7 @@
 
 
 void TokenGenerator::output(const char* target){
-    std::ofstream out(target);
+    std::ofstream out(std::string(target)+".hpp");
     outputPreprocessorDirectives(out);
     outputTokenType(out);
     out<<"\n\n";
@@ -90,8 +90,10 @@ std::ofstream& TokenGenerator::outputTokenType(std::ofstream& out) {
     printer(identifier_tokens, "// Raw Token Identifiers");
     printer(keywords_tokens, "// Keywords");
     printer(symbol_tokens, "// Symbols");
-    //Trailing Zeros
-    out << "\n};\n";
+    
+    out<<   "\n\tERROR,\n"
+            "\tEND_OF_FILE\n"
+            "\n};\n";
 
     return out;
 }
@@ -137,8 +139,13 @@ std::ofstream& TokenGenerator::outputToStringFunction(std::ofstream& out) {
     printer(keywords_tokens);
     printer(symbol_tokens);
 
-	out << "\t\tdefault: return \"UNKNOWN\";\n";
-	out << "\t}\n";
-	out << "}\n\n";
+out<<
+R"(        case TokenType::ERROR: return "ERROR";
+        case TokenType::END_OF_FILE: "EOF";
+        default: return "UNKNOWN";
+    }
+}
+
+)";
 	return out;
 }

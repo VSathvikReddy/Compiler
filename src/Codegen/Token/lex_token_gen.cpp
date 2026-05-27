@@ -5,6 +5,12 @@
 LexTokenGen::LexTokenGen(TokenGenerator& base)
     :symbol_tokens(base.symbol_tokens), keywords_tokens(base.keywords_tokens), identifier_tokens(base.identifier_tokens){}
 
+bool LexTokenGen::isJustRename(){
+    if(work_done==true){
+        work_done = false;
+        return true;
+    }return false;
+}
 
 void LexTokenGen::visit(const BinaryOperation& /*node*/){
     auto itr = identifier_tokens.find(std::string(root));
@@ -76,6 +82,7 @@ void LexTokenGen::visit(const StringNode&  node){
     }else{
         symbol_tokens[std::string(node.text)] = "SYMBOL_" + std::string(root);
     }
+    work_done = true;
     return;
 }
 void LexTokenGen::visit(const StringViewNode& /*node*/){
@@ -83,4 +90,5 @@ void LexTokenGen::visit(const StringViewNode& /*node*/){
 }  
 void LexTokenGen::visit(const CharNode& node){
     symbol_tokens[std::string(1,node.text)] = "SYMBOL_" + std::string(root);
+    work_done = true;
 }

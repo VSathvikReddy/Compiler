@@ -32,6 +32,7 @@ enum class TokenType : uint8_t {
     DOT,
 
     SEMICOLON,
+    ERROR,
     END_OF_FILE
 };
 
