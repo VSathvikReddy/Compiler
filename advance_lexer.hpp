@@ -36,9 +36,9 @@ private:
     void tokenize();
 
     
-    void skip_comment_and_whitespace();
-    void read_identifiers();
-    void read_symbols();
+    void skip_COMMENT_and_WHITESPACE();
+    void read_IDENTIFIER();
+    void read_SYMBOLS();
 
     void read_string_literal();
     void read_char_literal();

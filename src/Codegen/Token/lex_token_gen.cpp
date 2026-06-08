@@ -15,7 +15,7 @@ bool LexTokenGen::isJustRename(){
 void LexTokenGen::visit(const BinaryOperation& /*node*/){
     auto itr = identifier_tokens.find(std::string(root));
     if(itr==identifier_tokens.end()){
-        if(root != "COMMENT" && root!= "SKIP"){
+        if(root != "COMMENT" && root!= "WHITESPACE"){
             std::cerr<<"Warning: You defined a Litral Token but but not using it in you prasing trees\n"<<root<<'\n';
             identifier_tokens.emplace(std::string(root), "LITEREAL_" + std::string(root));
         }
@@ -27,7 +27,7 @@ void LexTokenGen::visit(const BinaryOperation& /*node*/){
 void LexTokenGen::visit(const UnaryOperation& /*node*/){
     auto itr = identifier_tokens.find(std::string(root));
     if(itr==identifier_tokens.end()){
-        if(root != "COMMENT" && root!= "SKIP"){
+        if(root != "COMMENT" && root!= "WHITESPACE"){
             std::cerr<<"Warning: You defined a Litral Token but but not using it in you prasing trees\n"<<root<<'\n';
             identifier_tokens.emplace(std::string(root), "LITEREAL_" + std::string(root));
         }
@@ -37,7 +37,7 @@ void LexTokenGen::visit(const UnaryOperation& /*node*/){
 void LexTokenGen::visit(const WildcardNode& /*node*/){
     auto itr = identifier_tokens.find(std::string(root));
     if(itr==identifier_tokens.end()){
-        if(root != "COMMENT" && root!= "SKIP"){
+        if(root != "COMMENT" && root!= "WHITESPACE"){
             std::cerr<<"Warning: You defined a Litral Token but but not using it in you prasing trees\n"<<root<<'\n';
             identifier_tokens.emplace(std::string(root), "LITEREAL_" + std::string(root));
         }
@@ -47,7 +47,7 @@ void LexTokenGen::visit(const WildcardNode& /*node*/){
 void LexTokenGen::visit(const RangeNode& /*node*/){
     auto itr = identifier_tokens.find(std::string(root));
     if(itr==identifier_tokens.end()){
-        if(root != "COMMENT" && root!= "SKIP"){
+        if(root != "COMMENT" && root!= "WHITESPACE"){
             std::cerr<<"Warning: You defined a Litral Token but but not using it in you prasing trees\n"<<root<<'\n';
             identifier_tokens.emplace(std::string(root), "LITEREAL_" + std::string(root));
         }
@@ -59,7 +59,7 @@ void LexTokenGen::visit(const RangeNode& /*node*/){
 inline bool is_valid_keyword_format(std::string_view sv) {
     if (sv.empty()) return false;
 
-    size_t i = 0;    // 1. Skip leading underscores
+    size_t i = 0;    // 1. WHITESPACE leading underscores
     while (i < sv.size() && sv[i] == '_')i++;
 
     if (i == sv.size()) return false;

@@ -16,6 +16,10 @@ public:
 
     void outputHPP(const std::string& hpp_name);
     void outputPreprocessorDirectives(std::ofstream& out);
+    void outputBasicStart(std::ofstream& out);
+    void outputBasicEnd(std::ofstream& out);
+
+    void outputIdentifier(std::ofstream& out);
 private:
     STRING_MAP &symbol_tokens;
     STRING_MAP &keywords_tokens;

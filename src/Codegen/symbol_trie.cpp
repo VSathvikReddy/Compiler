@@ -3,13 +3,11 @@
 
 #include "symbol_trie.hpp"
 
-SymbolTrie::Node::Node() {
-    for (int i = 0; i < 256; ++i) children[i] = nullptr;
-}
+SymbolTrie::Node::Node() {}
 SymbolTrie::Node::~Node(){
-    for (int i = 0; i < 256; ++i) {
-        if(children[i]){
-            delete children[i];
+    for (auto itr: children) {
+        if(itr.second){
+            delete itr.second;
         }
     }
 }
@@ -26,13 +24,12 @@ void SymbolTrie::insert(const std::string& key) {
     Node* curr = root;
 
     for (char c : key) {
-        unsigned char idx = static_cast<unsigned char>(c);
 
-        if (curr->children[idx] == nullptr) {
-            curr->children[idx] = new Node();
+        if (!curr->children[c]) {
+            curr->children[c] = new Node();
         }
         
-        curr = curr->children[idx];
+        curr = curr->children[c];
     }
 
     curr->isLeaf = true;
@@ -42,11 +39,11 @@ bool SymbolTrie::search(const std::string& key) const {
     const Node* curr = root;
 
     for (char c : key) {
-        unsigned char idx = static_cast<unsigned char>(c);
-        if (curr->children[idx] == nullptr) {
+        auto it = curr->children.find(c);
+        if (it == curr->children.end()) {
             return false;
         }
-        curr = curr->children[idx];
+        curr = it->second;
     }
     return curr->isLeaf;
 }

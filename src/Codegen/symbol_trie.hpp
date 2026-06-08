@@ -1,10 +1,11 @@
 #include <iostream>
 #include <string>
+#include <map>
 
 class SymbolTrie {
 private:
     struct Node {
-        Node* children[256];
+        std::map<char,Node*> children;
         bool isLeaf = false;
         Node();
         ~Node();

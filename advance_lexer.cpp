@@ -65,19 +65,18 @@ void Lexer::tokenize(){
 }
 #undef CHECK_BRANCH
 
-void Lexer::read_identifiers(){
-
-
-}
-
-
-void Lexer::read_symbols(){
+void Lexer::read_IDENTIFIER(){
 
 }
 
 
+void Lexer::read_SYMBOLS(){
 
-void Lexer::skip_comment_and_whitespace() {
+}
+
+
+
+void Lexer::skip_COMMENT_and_WHITESPACE() {
 
 }
 

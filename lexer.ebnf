@@ -1,6 +1,6 @@
 COMMENT -> "/*" ( !('*') | '*' !('/') )* "*/" ;
 COMMENT -> "//" !('\n')* '\n' ;
-SKIP -> ( ' ' | '\r' | '\t' )+ ;
+WHITESPACE -> ( ' ' | '\r' | '\t' )+ ;
 LINEBREAKER -> '\n' ;
 
 INTEGER -> ['0'-'9']+ ;
